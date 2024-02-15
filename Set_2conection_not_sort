@@ -1,0 +1,253 @@
+#include <iostream>
+using std::cout;
+using namespace std;
+class Set
+{
+private:
+    struct Node
+    {
+        int value;
+        Node* next;
+        Node* prev;
+    };
+
+    Node* head;
+    Node* tail;
+
+public:
+    Set(); //конструктор
+    Set(const Set& other); //конструктор копирвования
+    ~Set(); //Деструктор
+
+    int size() const; //длина множества
+    void print() const;
+    bool contains(int element) const; //проверка на вхождение
+
+    Set& operator=(const Set& other); //оператор присваивания
+    Set operator+(int element) const;//перегрузка оператора сложения с элементом
+    Set operator+(const Set& other) const;//перегрузка оператора сложения с другим множеством
+    Set operator-(int element) const; //перегрузка оператора разности с другим элементом
+    Set operator-(const Set& other) const; //перегрузка оператора разности с другим множеством
+    Set operator*(int element) const; //перегрузка оператора пересечения с другим элементом
+    Set operator*(const Set& other) const; //перегрузка оператора пересечения с другим  множеством
+};
+
+Set::Set()
+{
+    head = nullptr;
+    tail = nullptr;
+}
+
+Set::Set(const Set& other)
+{
+    head = nullptr;
+    tail = nullptr;
+    Node* otherCurr = other.head;
+    while (otherCurr != nullptr)
+    {
+        Node* newNode = new Node;
+        newNode->value = otherCurr->value;
+        newNode->prev = tail;
+        newNode->next = nullptr;
+
+        if (head == nullptr)
+        {
+            head = newNode;
+        }
+        if (tail != nullptr)
+        {
+            tail->next = newNode;
+        }
+        tail = newNode;
+
+        otherCurr = otherCurr->next;
+    }
+}
+
+Set::~Set()
+{
+    Node* curr = head;
+    while (curr != nullptr)
+    {
+        Node* temp = curr;
+        curr = curr->next;
+        delete temp;
+    }
+}
+
+int Set::size() const
+{
+    int count = 0;
+    Node* curr = head;
+    while (curr != nullptr)
+    {
+        count++;
+        curr = curr->next;
+    }
+    return count;
+}
+
+void Set::print() const
+{
+    if (head == nullptr)
+    {
+        cout << "Множество пусто" << endl;
+    }
+    else
+    {
+        cout << "Множество содержит элементы: ";
+        Node* curr = head;
+        while (curr != nullptr)
+        {
+            std::cout << curr->value << " ";
+            curr = curr->next;
+        }
+        cout << endl;
+        cout << "Множество содержит " << size() << " элементов." << endl;
+    }
+}
+
+bool Set::contains(int element) const
+{
+    Node* curr = head;
+    while (curr != nullptr)
+    {
+        if (curr->value == element)
+        {
+            return true;
+        }
+        curr = curr->next;
+    }
+    return false;
+}
+
+Set& Set::operator=(const Set& other)
+{
+    if (this == &other)
+    {
+        return *this;
+    }
+
+    *this = other + *this;
+
+    return *this;
+}
+
+Set Set::operator+(int element) const
+{
+    Set result = *this;
+    if (!result.contains(element))
+    {
+        Node* newNode = new Node;
+        newNode->value = element;
+        newNode->prev = result.tail;
+        newNode->next = nullptr;
+
+        if (result.head == nullptr)
+        {
+            result.head = newNode;
+        }
+        if (result.tail != nullptr)
+        {
+            result.tail->next = newNode;
+        }
+        result.tail = newNode;
+    }
+    return result;
+}
+
+Set Set::operator+(const Set& other) const
+{
+    Set result = *this;
+    result = result + other;
+    return result;
+}
+
+
+Set Set::operator-(int element) const
+{
+    Set result = *this;
+    if (result.contains(element))
+    {
+        result = result - element;
+    }
+    return result;
+}
+
+
+Set Set::operator-(const Set& other) const
+{  // cout<<"-2"<<endl;
+    Set result = *this;
+    Node* otherCurr = other.head;
+    while (otherCurr != nullptr)
+    {
+        result = result - otherCurr->value;
+        otherCurr = otherCurr->next;
+    }
+    return result;
+}
+
+Set Set::operator*(int element) const
+{
+    Set result;
+    if (contains(element))
+    {
+        result = result + element;
+    }
+    return result;
+}
+Set Set::operator*(const Set& other) const
+{
+    Set result;
+    Node* curr = head;
+    while (curr != nullptr)
+    {
+        if (other.contains(curr->value))
+        {
+            result = result + curr->value;
+        }
+        curr = curr->next;
+    }
+    return result;
+}
+
+int main()
+{
+    Set set1;
+
+    for (int i = 2; i < 10; i+=2) {
+        set1 = set1 + i;
+    }
+
+    Set set2;
+ for (int i = 1; i < 10; i += 2) {
+        set2 = set2 + i;
+    }
+
+  
+
+   
+ /*   int element = 2;
+    bool containsElement = set1.contains(element);
+    if (containsElement)
+    {
+        cout << "Элемент " << element << " содержится в множестве." << endl << endl;
+    }
+    else
+    {
+        cout << "Элемент " << element << " не содержится в множестве." << endl << endl;
+    }
+    */
+
+    set1.print();
+    set2.print();
+    Set set3;
+   // set1 = set1 * set1 - set2;
+   set1=set1*set2;
+   set1.print();
+   
+   cout <<"***************************************************"<< endl;
+  
+
+    return 0;
+}
