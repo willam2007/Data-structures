@@ -1,0 +1,157 @@
+#include <iostream>
+using namespace std;
+
+class Queue {
+private:
+    int maxSize;
+    int* queue;
+    int head;
+    int tail;
+
+public:
+    Queue(int size) : maxSize(size), head(0), tail(0) {
+        queue = new int[maxSize];
+    }
+
+    Queue(const Queue& other) : maxSize(other.maxSize), head(other.head), tail(other.tail) {
+        queue = new int[maxSize];
+        for (int i = head; i < tail; ++i) {
+            queue[i] = other.queue[i];
+        }
+    }
+
+    ~Queue() {
+        delete[] queue;
+    }
+
+    void shiftR(int startPos, int* arr, int length) {
+        for (int i = length - 1; i >= startPos; --i) {
+            arr[i + 1] = arr[i];
+        }
+    }
+
+    void shiftL(int startPos, int* arr, int length) {
+        for (int i = startPos; i < length - 1; ++i) {
+            arr[i] = arr[i + 1];
+        }
+    }
+
+    void add(int element) {
+        if (tail >= maxSize) {
+            cout << "Очередь полна. Невозможно добавить элемент." << endl;
+            return;
+        }
+
+        queue[tail] = element;
+        ++tail;
+    }
+
+    int del() {
+        if (head == tail) {
+            cout << "Очередь пуста. Невозможно удалить элемент." << endl;
+            return -1;
+        }
+
+        int maxElement = queue[head];
+        int maxIndex = head;
+
+        for (int i = head + 1; i < tail; ++i) {
+            if (queue[i] > maxElement) {
+                maxElement = queue[i];
+                maxIndex = i;
+            }
+        }
+
+        if (maxIndex - head >= tail - maxIndex) {
+            shiftL(maxIndex, queue, tail);
+            --tail;
+        } else {
+            shiftR(head, queue, tail);
+            --tail;
+            ++head;
+        }
+
+        return maxElement;
+    }
+
+    bool search(int element) {
+        for (int i = head; i < tail; ++i) {
+            if (queue[i] == element) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    int length() {
+        return tail - head;
+    }
+
+    void print() {
+        if (head == tail) {
+            cout << "Очередь пуста." << endl;
+            return;
+        }
+
+        cout << "Очередь: ";
+        for (int i = head; i < tail; ++i) {
+            cout << queue[i] << " ";
+        }
+        cout << endl;
+    }
+
+    Queue& operator=(const Queue& other) {
+        if (this == &other) {
+            return *this;
+        }
+
+        maxSize = other.maxSize;
+        head = other.head;
+        tail = other.tail;
+
+        delete[] queue;
+        queue = new int[maxSize];
+
+        for (int i = head; i < tail; ++i) {
+            queue[i] = other.queue[i];
+        }
+
+        return *this;
+    }
+};
+
+int main() {
+    Queue queue1(5);
+    Queue queue2(9);
+    
+    for (int i=1;i<11;i++){
+    
+    queue1.add(i % 5);
+    queue2.add(i % 7);
+}
+    queue1.print();
+    cout << "Длина очереди: " << queue1.length() << endl;
+  
+    queue2.print();  
+    cout << "Длина очереди: " << queue2.length() << endl;
+    
+     for (int i=1;i<4;i++){
+    
+    queue1.del();
+    queue2.del();
+}
+    queue1.print();
+    cout << "Длина очереди: " << queue1.length() << endl;
+  
+    queue2.print();  
+    cout << "Длина очереди: " << queue2.length() << endl;
+    
+    
+    queue1=queue2;
+     queue1.print();
+    cout << "Длина очереди: " << queue1.length() << endl;
+  
+    queue2.print();  
+    cout << "Длина очереди: " << queue2.length() << endl;
+    
+}
