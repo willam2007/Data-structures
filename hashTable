@@ -1,0 +1,250 @@
+#include <iostream>
+#include <iomanip>
+#include <string>
+using std::cin;  using std::cout; using std::endl;
+
+class HashTable {
+public:
+    struct Record {
+        unsigned long long int key;
+        std::string data;
+        int status;
+    };
+
+private:
+    int size;
+    int k;
+    Record* table;
+
+    int H1(unsigned long long int key) {
+        return key % size;
+    }
+
+    int H2(unsigned int adr, int i) {
+        return (adr + i * k) % size;
+    }
+
+    int CalculateK() {
+        int k = 2;
+        while (size % k == 0) {
+            k++;
+        }
+        return k;
+    }
+
+public:
+    HashTable(int size) {
+        this->size = size;
+        this->k = CalculateK();
+        this->table = new Record[size];
+        for (int i = 0; i < size; i++) {
+            table[i].status = 0;
+        }
+    }
+
+    ~HashTable() {
+        delete[] table;
+    }
+
+    bool Add(Record record) {
+    unsigned long long int key = record.key;
+    int index1 = H1(key);
+    int i = 0;
+    int index = index1;
+
+    while (table[index].status != 0) {
+        if (table[index].key == key) {
+            cout << "Запись с ключом " << key << " уже существует, добавление останавливается." << endl;
+            return false;
+        }
+        index = H2(index1, ++i);
+        if (index == index1) {
+            cout << "Хеш-таблица заполнена." << endl;
+            return false;  // Хеш-таблица заполнена
+        }
+    }
+
+    table[index] = record;
+    table[index].status = 1;
+    return true;
+}
+
+
+void Del(const Record& record) {
+    unsigned long long int key = record.key;
+    int index1 = H1(key);
+    int index = index1;
+    int i = 0;
+    int count = 0;
+    int synonymIndex = -1;
+
+    while (table[index].status != 0) {
+        if (table[index].key == key) {
+            table[index].status = 0;
+            count++;
+            if (synonymIndex == -1) {
+                synonymIndex = index;
+            }
+        } else if (synonymIndex != -1) {
+            if (H1(table[index].key) == H1(key)) {
+                table[synonymIndex] = table[index];
+                table[index].status = 0;
+                synonymIndex = index;
+            }
+        }
+        index = H2(index1, ++i);
+        if (index == index1) {
+            break;
+        }
+    }
+
+    if (count == 0) {
+        std::cout << "Запись не найдена." << std::endl;
+        return;
+    }
+
+    if (count > 1 && synonymIndex != -1) {
+        index = H2(index1, i);
+        while (index != synonymIndex) {
+            if (table[index].status != 0 && H1(table[index].key) == H1(key)) {
+                table[synonymIndex] = table[index];
+                table[index].status = 0;
+                synonymIndex = index;
+            }
+            index = H2(index1, ++i);
+        }
+    }
+}
+
+void Search(const Record& record) {
+    unsigned long long int key = record.key;
+    int index1 = H1(key);
+    int i = 0;
+    int index = index1;
+
+    while (table[index].status != 0) {
+        if (table[index].status == 1 && table[index].key == record.key && table[index].data == record.data) {
+            std::cout << "Запись найдена." << std::endl;
+            return;
+        }
+        index = H2(index1, ++i);
+        if (index == index1) {
+            break;
+        }
+    }
+
+    std::cout << "Запись с ключом не найдена." << std::endl;
+}
+
+
+
+
+
+
+
+    void Print() {
+        std::cout << "+------+-------------+---------------------+" << std::endl;
+        std::cout << "| Номер |    Ключ     |        Запись       |" << std::endl;
+        std::cout << "+------+-------------+---------------------+" << std::endl;
+
+        for (int i = 0; i < size; i++) {
+            if (table[i].status == 1) {
+                std::cout << "| " << std::setw(4) << i << " | " << std::setw(11) << table[i].key << " | " << std::setw(20) << table[i].data << " |" << std::endl;
+            }
+        }
+
+        std::cout << "+------+-------------+---------------------+" << std::endl;
+    }
+};
+
+int main() {
+    HashTable hashTable(10);
+    std::cout << "Пустая таблица:" << std::endl;
+    hashTable.Print();
+
+    // Создаем и добавляем записи в хеш-таблицу
+ /*   HashTable::Record records[] = {
+        { 123456755, "John Smith", 0 },
+        { 123456785, "Jane Doe", 0 },
+        { 555555595, "Mike Johnson", 0 }
+    }; 
+    
+  
+
+    int numRecords = sizeof(records) / sizeof(records[0]);
+    for (int i = 0; i < numRecords; i++) {
+        if (!hashTable.Add(records[i])) {
+            break;
+        }
+    }*/
+
+    // Печатаем хеш-таблицу
+    /*std::cout << "Хеш таблица после добавления:" << std::endl;
+    hashTable.Print();
+
+  
+    
+      HashTable::Record rr = { 123456755, "John Smith", 0 };
+      hashTable.Add(rr);
+      hashTable.Print();
+      hashTable.Del(rr);*/
+      
+      
+ 
+    
+
+    // Печатаем хеш-таблицу после удаления
+    
+    /*HashTable::Record r = { 555552342, "Mike John", 0  };
+    HashTable::Record rr = { 555555595, "Mike Johnson", 0  };
+    HashTable::Record rrr = { 123456777, "John Smit", 0 };
+    hashTable.Add(r);
+    hashTable.Print();
+    hashTable.Add(rr);
+    hashTable.Print();
+    hashTable.Add(rrr);
+    hashTable.Print();
+    hashTable.Del(rr);
+    hashTable.Print();
+    hashTable.Search(rr);*/
+    
+   
+     /* HashTable::Record rr = { 555552312, "Mike John", 0  };
+       HashTable::Record rrr = { 555552322, "Mike John", 0  };
+        HashTable::Record rrrr = { 555555232, "Mike John", 0  };*/
+         HashTable::Record rrrrr = { 555552342, "Mike John", 0  };
+         
+for (int i=5;i<17;i++) {        
+        HashTable::Record r = { 5000000+i*5, "Mike John", 0  };   
+        hashTable.Add(r);
+}
+     /*   hashTable.Add(rr);
+        hashTable.Add(rrr);
+        hashTable.Add(rrrr);
+        hashTable.Add(rrrrr);*/
+        hashTable.Print();
+ /*   hashTable.Del(r);
+    hashTable.Print();
+    hashTable.Del(rrr);
+    hashTable.Print();*/
+ for (int i=2;i<17;i+=1) {        
+        HashTable::Record r = { 5000000+(10-i)*10, "Mike John", 0  }; 
+        std::cout<<"DEL->"<<5000000+i*10<<endl;
+        hashTable.Del(r);
+        hashTable.Print();
+}
+  
+    
+   
+
+
+         
+    //hashTable.Search(searchRecord); // Запись найдена
+    
+}
+
+
+
+
+
+
